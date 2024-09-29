@@ -2,7 +2,7 @@
 #include <iostream>
 #include "FlappyBird.hpp" 
 
-
+ 
 int main() {
 	sf::RenderWindow window(sf::VideoMode(800, 600), "Flappy Bird");
 	window.setFramerateLimit(60);
