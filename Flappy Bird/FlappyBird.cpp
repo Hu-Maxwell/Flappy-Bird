@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp> 
 #include <iostream>
+#include <vector>
 
 class BouncingBall {
 public: 
@@ -33,11 +34,11 @@ public:
 		}
 	}
 
-	void moveBall(const float gravity, const float groundHeight) {
+	void moveBall(const float gravity) {
 		position.y += velocityY;
 
-		if (position.y >= groundHeight) {
-			position.y = groundHeight;
+		if (position.y >= 600) {
+			position.y = 600;
 			velocityY = 0;
 		} // if it is touching roof, stop its velocity
 		else if (position.y < circle.getRadius() * 2) {
@@ -53,9 +54,41 @@ public:
 
 };
 
+class Pipes {
+public:
+	std::vector<sf::RectangleShape> pipesList; 
+
+	Pipes() {
+		
+	}
+
+	void add(sf::Vector2f position, sf::Vector2f area) { // parameters are position, width and height 
+		sf::RectangleShape newPipe(area); 
+		newPipe.setPosition(position); 
+
+		pipesList.push_back(newPipe); 
+	}
+
+	void ballTouchesPipe(BouncingBall& ball) {
+		for (int i = 0; i < pipesList.size(); i++) {
+			if (ball.circle.getGlobalBounds().intersects(pipesList[i].getGlobalBounds())) {
+				std::cout << "biag"; 
+			}
+		}
+	}
+
+	void drawPipes(sf::RenderWindow& window) {
+		for (int i = 0; i < pipesList.size(); i++) {
+			window.draw(pipesList[i]);
+		}
+	}
+};
+
 void gameLoop(sf::RenderWindow& window) {
 	// initializing circle
 	BouncingBall ball(window);
+	Pipes pipes; 
+	pipes.add(sf::Vector2f(300, 0), sf::Vector2f(200, 100));
 
 	// defining gravity, velocity, and initial jump velocity variables
 	const float gravity = +1.0f;
@@ -65,10 +98,7 @@ void gameLoop(sf::RenderWindow& window) {
 	float jumpCooldown = .15f;
 	float timeSinceLastJump = 0.0f;
 
-	// defining ground
-	sf::RectangleShape rectangle(sf::Vector2f(800, 100));
-	const float groundHeight = 500; // 100 above the bottom
-	rectangle.setPosition(0, groundHeight);
+
 
 	sf::Clock clock;
 	while (window.isOpen()) {
@@ -88,11 +118,13 @@ void gameLoop(sf::RenderWindow& window) {
 		}
 
 		ball.colorBall(timeSinceLastJump); 
-		ball.moveBall(gravity, groundHeight); 
+		ball.moveBall(gravity); 
+
+		pipes.ballTouchesPipe(ball); 
 
 		window.clear();
 		window.draw(ball.circle);
-		window.draw(rectangle);
+		pipes.drawPipes(window); 
 		window.display();
 	}
 }
