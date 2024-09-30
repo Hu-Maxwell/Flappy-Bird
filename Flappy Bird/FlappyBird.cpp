@@ -57,9 +57,10 @@ public:
 class Pipes {
 public:
 	std::vector<sf::RectangleShape> pipesList; 
+	float velocity; 
 
 	Pipes() {
-		
+		velocity = -3.0f;
 	}
 
 	void add(sf::Vector2f position, sf::Vector2f area) { // parameters are position, width and height 
@@ -74,6 +75,14 @@ public:
 			if (ball.circle.getGlobalBounds().intersects(pipesList[i].getGlobalBounds())) {
 				std::cout << "biag"; 
 			}
+		}
+	}
+
+	void movePipes() {
+		for (int i = 0; i < pipesList.size(); i++) {
+			sf::RectangleShape& curPipe = pipesList[i]; 
+			sf::Vector2f newPosition(curPipe.getPosition().x + velocity, curPipe.getPosition().y);
+			pipesList[i].setPosition(newPosition); 
 		}
 	}
 
@@ -121,6 +130,7 @@ void gameLoop(sf::RenderWindow& window) {
 		ball.moveBall(gravity); 
 
 		pipes.ballTouchesPipe(ball); 
+		pipes.movePipes(); 
 
 		window.clear();
 		window.draw(ball.circle);
