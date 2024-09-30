@@ -63,11 +63,25 @@ public:
 		velocity = -3.0f;
 	}
 
-	void add(sf::Vector2f position, sf::Vector2f area) { // parameters are position, width and height 
-		sf::RectangleShape newPipe(area); 
-		newPipe.setPosition(position); 
+	void generateRandomPipe(float& timeSinceLastNewPipe) {
+		float width = 180; 
+		float gapBetweenPipes = 250; 
 
-		pipesList.push_back(newPipe); 
+		if (timeSinceLastNewPipe > 2.2f) {
+			srand((unsigned)time(NULL)); 
+			float height = 50 + (100 * (rand() % 3)); // between 50 and 350
+
+			sf::RectangleShape newTopPipe(sf::Vector2f(width, height)); 
+			newTopPipe.setPosition(800, 0); 
+
+			sf::RectangleShape newLowPipe(sf::Vector2f(width, 600)); 
+			newLowPipe.setPosition(800, height + gapBetweenPipes); 
+
+			pipesList.push_back(newTopPipe);
+			pipesList.push_back(newLowPipe); 
+
+			timeSinceLastNewPipe = 0; 
+		}
 	}
 
 	void ballTouchesPipe(BouncingBall& ball) {
@@ -97,7 +111,6 @@ void gameLoop(sf::RenderWindow& window) {
 	// initializing circle
 	BouncingBall ball(window);
 	Pipes pipes; 
-	pipes.add(sf::Vector2f(300, 0), sf::Vector2f(200, 100));
 
 	// defining gravity, velocity, and initial jump velocity variables
 	const float gravity = +1.0f;
@@ -107,12 +120,19 @@ void gameLoop(sf::RenderWindow& window) {
 	float jumpCooldown = .15f;
 	float timeSinceLastJump = 0.0f;
 
+	// pipe cooldown variables
+	float timeSinceLastNewPipe = 0.0f;
 
 
-	sf::Clock clock;
+
+	sf::Clock ballClock;
+	sf::Clock pipeClock;
 	while (window.isOpen()) {
-		float deltaTime = clock.restart().asSeconds();
-		timeSinceLastJump += deltaTime;
+		float ballDeltaTime = ballClock.restart().asSeconds();
+		timeSinceLastJump += ballDeltaTime;
+
+		float pipeDeltaTime = pipeClock.restart().asSeconds(); 
+		timeSinceLastNewPipe += pipeDeltaTime; 
 
 		sf::Event event;
 		while (window.pollEvent(event)) {
@@ -131,6 +151,7 @@ void gameLoop(sf::RenderWindow& window) {
 
 		pipes.ballTouchesPipe(ball); 
 		pipes.movePipes(); 
+		pipes.generateRandomPipe(timeSinceLastNewPipe); 
 
 		window.clear();
 		window.draw(ball.circle);

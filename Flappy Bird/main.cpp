@@ -3,10 +3,10 @@
 #include "FlappyBird.hpp" 
 
 // todo: 
-// delete floor and change it to rectangles that move left
+// check - is the 2 clock system ineffcient? 
+// instead of using clock, use distance from right of screen
 // change game screen once ball hits pipe
-// make pipes infinitely generating
-// give pipes a texture
+// give everything a texture
 // create a background
 
 
