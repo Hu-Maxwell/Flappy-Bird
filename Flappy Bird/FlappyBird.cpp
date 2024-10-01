@@ -219,7 +219,7 @@ void gameScreen(sf::RenderWindow& window) {
 void startScreen(sf::RenderWindow& window) {
 
 	sf::Font font;
-	if (!font.loadFromFile("C:/Users/maxwe/source/repos/TicTacToe Redo/TicTacToe Redo/fonts/semibold.ttf")) {
+	if (!font.loadFromFile("assets/fonts/semibold.ttf")) {
 		std::cerr << "Failed to load font" << std::endl;
 		return; 
 	}
