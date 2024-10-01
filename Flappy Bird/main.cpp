@@ -15,6 +15,7 @@ int main() {
 	window.setFramerateLimit(60);
 
 	while (window.isOpen()) {
-		gameLoop(window); 
+		startScreen(window); 
+		gameScreen(window); 
 	}
 }

@@ -17,7 +17,8 @@ public:
 	void moveBall(const float& gravity, const float& groundHeight);
 }; */ 
 
-void gameLoop(sf::RenderWindow& window);
+void startScreen(sf::RenderWindow& window);
+void gameScreen(sf::RenderWindow& window);
 
 
 #endif
