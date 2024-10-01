@@ -24,14 +24,14 @@ public:
 
 		rectangle.setPosition(position);
 
-		if (!texture.loadFromFile("C:/Users/maxwe/source/repos/Flappy Bird/Flappy Bird/flappyBird.png")) {
+		if (!texture.loadFromFile("assets/flappyBird.png")) {
 			return;
 		}
 		else {
 			rectangle.setTexture(&texture);
 		}
 
-		if (!animation.loadFromFile("C:/Users/maxwe/source/repos/Flappy Bird/Flappy Bird/flappyBirdAnimation.png")) {
+		if (!animation.loadFromFile("assets/flappyBirdAnimation.png")) {
 			return;
 		}
 	}
@@ -76,11 +76,11 @@ public:
 
 	Pipes() {
 		velocity = -3.0f;
-		if (!textureTop.loadFromFile("C:/Users/maxwe/source/repos/Flappy Bird/Flappy Bird/topPipe.png")) {
+		if (!textureTop.loadFromFile("assets/topPipe.png")) {
 			return;
 		}
 
-		if (!textureLow.loadFromFile("C:/Users/maxwe/source/repos/Flappy Bird/Flappy Bird/lowPipe.png")) {
+		if (!textureLow.loadFromFile("assets/lowPipe.png")) {
 			std::cout << "biag"; 
 			return;
 		}
@@ -145,7 +145,7 @@ public:
 
 void drawBackground(sf::RenderWindow& window) {
 	sf::Texture texture;
-	if (!texture.loadFromFile("C:/Users/maxwe/source/repos/Flappy Bird/Flappy Bird/bg.png")) {
+	if (!texture.loadFromFile("assets/bg.png")) {
 		return;
 	}
 
