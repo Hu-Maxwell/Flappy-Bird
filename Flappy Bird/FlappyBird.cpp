@@ -4,61 +4,65 @@
 #include <iostream>
 #include <vector>
 
-class BouncingBall {
+class Bird {
 public: 
-	sf::CircleShape circle;
+	sf::RectangleShape rectangle;
 	sf::Vector2f position; 
 	float velocityY; 
 	bool jumped;
 	sf::Texture texture; 
+	sf::Texture animation;
 
+	Bird(sf::RenderWindow& window) {
+		rectangle.setSize(sf::Vector2f(100.0f, 100.0f));
+		rectangle.setOrigin(0, rectangle.getSize().y);
 
-	BouncingBall(sf::RenderWindow& window) {
-
-		circle.setRadius(50);
-		circle.setOrigin(0, circle.getRadius() * 2);
-
-		position.x = window.getSize().x / 2 - circle.getRadius();
-		position.y = window.getSize().y / 2 + circle.getRadius();
+		position.x = window.getSize().x / 2 - rectangle.getSize().x / 2;
+		position.y = window.getSize().y / 2 + rectangle.getSize().x / 2;
 		velocityY = 0; 
 		jumped = false; 
 
-		circle.setPosition(position); 
+		rectangle.setPosition(position);
 
-		if (!texture.loadFromFile("C:/Users/maxwe/source/repos/SFML images app/billyman.png")) {
+		if (!texture.loadFromFile("C:/Users/maxwe/source/repos/Flappy Bird/Flappy Bird/flappyBird.png")) {
 			return;
 		}
 		else {
-			circle.setTexture(&texture);
+			rectangle.setTexture(&texture);
+		}
+
+		if (!animation.loadFromFile("C:/Users/maxwe/source/repos/Flappy Bird/Flappy Bird/flappyBirdAnimation.png")) {
+			return;
 		}
 	}
 
-	void colorBall(const float timeSinceLastJump) {
-		// sets the color to be red after jump
-		if (timeSinceLastJump <= .15 && jumped == true && circle.getFillColor() != sf::Color::Red) {
-			circle.setFillColor(sf::Color::Red);
+	void colorBird(const float timeSinceLastJump) {
+
+		// changes texture during jump
+		if (timeSinceLastJump <= .15 && jumped == true && rectangle.getTexture() != &animation) {
+			rectangle.setTexture(&animation);
 		}
-		else if (timeSinceLastJump >= .15 && circle.getFillColor() != sf::Color::White) {
-			circle.setFillColor(sf::Color::White);
+		else if (timeSinceLastJump >= .15 && rectangle.getTexture() != &texture) {
+			rectangle.setTexture(&texture);
 		}
 	}
 
-	void moveBall(const float gravity) {
+	void moveBird(const float gravity) {
 		position.y += velocityY;
 
 		if (position.y >= 600) {
 			position.y = 600;
 			velocityY = 0;
 		} // if it is touching roof, stop its velocity
-		else if (position.y < circle.getRadius() * 2) {
-			position.y = circle.getRadius() * 2;
+		else if (position.y < rectangle.getSize().y) {
+			position.y = rectangle.getSize().y;
 			velocityY = 0;
 		}
 		else { // if it is neither on ground or touching roof, velocity is being affected by gravity
 			velocityY += gravity;
 		}
 
-		circle.setPosition(position.x, position.y);
+		rectangle.setPosition(position.x, position.y);
 	}
 
 };
@@ -72,11 +76,12 @@ public:
 
 	Pipes() {
 		velocity = -3.0f;
-		if (!textureTop.loadFromFile("C:/Users/maxwe/source/repos/SFML images app/nevilleman.jpg")) {
+		if (!textureTop.loadFromFile("C:/Users/maxwe/source/repos/Flappy Bird/Flappy Bird/topPipe.png")) {
 			return;
 		}
 
-		if (!textureLow.loadFromFile("C:/Users/maxwe/source/repos/SFML images app/birbman.jpg")) {
+		if (!textureLow.loadFromFile("C:/Users/maxwe/source/repos/Flappy Bird/Flappy Bird/lowPipe.png")) {
+			std::cout << "biag"; 
 			return;
 		}
 	}
@@ -101,9 +106,11 @@ public:
 			newTopPipe.setPosition(800, 0); 
 			newTopPipe.setTexture(&textureTop); 
 
-			sf::RectangleShape newLowPipe(sf::Vector2f(width, 600)); 
+
+			sf::RectangleShape newLowPipe(sf::Vector2f(width, 600 - (height + distanceYPipe))); 
 			newLowPipe.setPosition(800, height + distanceYPipe);
 			newLowPipe.setTexture(&textureLow);
+
 
 			pipesList.push_back(newTopPipe);
 			pipesList.push_back(newLowPipe); 
@@ -112,9 +119,9 @@ public:
 		}
 	}
 
-	bool ballTouchesPipe(BouncingBall& ball) {
+	bool ballTouchesPipe(Bird& ball) {
 		for (int i = 0; i < pipesList.size(); i++) {
-			if (ball.circle.getGlobalBounds().intersects(pipesList[i].getGlobalBounds())) {
+			if (ball.rectangle.getGlobalBounds().intersects(pipesList[i].getGlobalBounds())) {
 				return true;
 			}
 		}
@@ -138,19 +145,24 @@ public:
 
 void drawBackground(sf::RenderWindow& window) {
 	sf::Texture texture;
-	if (!texture.loadFromFile("C:/Users/maxwe/source/repos/SFML images app/billyman.png")) {
+	if (!texture.loadFromFile("C:/Users/maxwe/source/repos/Flappy Bird/Flappy Bird/bg.png")) {
 		return;
 	}
 
+	float scaleX = static_cast<float>(window.getSize().x) / texture.getSize().x;
+	float scaleY = static_cast<float>(window.getSize().y) / texture.getSize().y;
+
+
 	sf::Sprite sprite;
 	sprite.setTexture(texture);
+	sprite.setScale(scaleX, scaleY); 
 
 	window.draw(sprite);
 }
 
 void gameScreen(sf::RenderWindow& window) {
 	// initializing circle
-	BouncingBall ball(window);
+	Bird bird(window);
 	Pipes pipes; 
 
 	// defining gravity, velocity, and initial jump velocity variables
@@ -183,22 +195,22 @@ void gameScreen(sf::RenderWindow& window) {
 
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && timeSinceLastJump > jumpCooldown) {
 			timeSinceLastJump = 0;
-			ball.jumped = true;
-			ball.velocityY = initialJumpVelocity;
+			bird.jumped = true;
+			bird.velocityY = initialJumpVelocity;
 		}
 
-		ball.colorBall(timeSinceLastJump); 
-		ball.moveBall(gravity); 
+		bird.colorBird(timeSinceLastJump);
+		bird.moveBird(gravity);
 
 		pipes.movePipes(); 
 		pipes.generateRandomPipe(timeSinceLastNewPipe); 
-		if (pipes.ballTouchesPipe(ball)) {
+		if (pipes.ballTouchesPipe(bird)) {
 			return; 
 		}
 
 		window.clear();
 		drawBackground(window); 
-		window.draw(ball.circle);
+		window.draw(bird.rectangle);
 		pipes.drawPipes(window); 
 		window.display();
 	}
